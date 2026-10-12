@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מזג האוויר בישראל · תחזית חיה</title>
+<meta name="description" content="תחזית מזג האוויר לפי נתוני השירות המטאורולוגי הישראלי, מתעדכנת כל שעה.">
+<meta name="theme-color" content="#0b1d3a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9B%85%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div id="flash" aria-hidden="true"></div>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <span class="brand-dot" aria-hidden="true"></span>
+      <span>מזג האוויר בישראל</span>
+    </div>
+    <div class="clock" aria-label="השעה בישראל">
+      <span id="clock" dir="ltr">--:--:--</span>
+      <span id="dateline" class="dateline"></span>
+    </div>
+    <div class="top-tools">
+      <label class="select">
+        <span class="sr">בחירת עיר</span>
+        <select id="citySel"></select>
+      </label>
+    </div>
+  </header>
+
+  <div id="banner" class="banner" hidden></div>
+  <section id="alerts" class="alerts" aria-live="polite"></section>
+
+  <main>
+    <section id="hero" class="hero"></section>
+
+    <section class="block">
+      <h2 id="weekTitle">הימים הקרובים</h2>
+      <div id="week" class="week"></div>
+    </section>
+
+    <section class="block">
+      <h2>תחזית כללית לרחבי הארץ</h2>
+      <div id="country" class="country"></div>
+    </section>
+
+    <section class="block">
+      <h2>כל הערים</h2>
+      <div id="cities" class="cities"></div>
+    </section>
+
+    <section class="block two">
+      <div>
+        <h2>מצב הים</h2>
+        <div id="sea" class="sea"></div>
+      </div>
+      <div>
+        <h2>קרינת UV</h2>
+        <div id="uv" class="uv"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>המידע מבוסס על תחזיות ואזהרות ה-RSS של <a href="https://ims.gov.il/he/RSS_ForecastAlerts" target="_blank" rel="noopener">השירות המטאורולוגי הישראלי</a> ואינו מהווה תחליף לפרסומיו הרשמיים. התחזיות עלולות להשתנות; בעת אזהרה יש להסתמך על האתר הרשמי.</p>
+    <p class="foot-sub">אתר זה אינו אתר רשמי ואינו קשור לשירות המטאורולוגי. <span id="footUpdate"></span></p>
+  </footer>
+</div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
