@@ -1,0 +1,61 @@
+name: ריצת קדם – בדיקת ערוצי IMS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: משיכת ערוצי ה-RSS ויצירת דוח
+        run: |
+          cat > probe.py <<'PYEOF'
+          import urllib.request, urllib.error, time, re
+          B = "https://ims.gov.il/sites/default/files/ims_data/rss/"
+          F = ["forecast_country/rssForecastCountry_he.xml", "forecast_radiation/rssForecastRadiation_he.xml",
+               "forecast_sea/rssForecastSea_210_he.xml", "forecast_sea/rssForecastSea_211_he.xml",
+               "forecast_city/rssForecastCity_402_he.xml", "forecast_city/rssForecastCity_510_he.xml",
+               "forecast_city/rssForecastCity_520_he.xml", "forecast_city/rssForecastCity_115_he.xml",
+               "alert/rssAlert_general_country_he.xml", "alert/rssAlert_sea_country_he.xml"]
+          H = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+               "Accept": "application/rss+xml, application/xml, text/xml, */*"}
+          out = []
+          for p in F:
+              out.append("=" * 60 + "\n" + p)
+              try:
+                  t = time.time()
+                  r = urllib.request.urlopen(urllib.request.Request(B + p, headers=H), timeout=30)
+                  data = r.read()
+                  txt = data.decode("utf-8", "replace")
+                  out.append(f"HTTP {r.status} | {len(data)} bytes | {time.time()-t:.1f}s | {r.headers.get('Content-Type')}")
+                  out.append(f"items: {len(re.findall(r'<item[ >]', txt))}")
+                  out.append(txt[:3500] + ("\n...[נחתך]" if len(txt) > 3500 else ""))
+              except urllib.error.HTTPError as e:
+                  out.append(f"HTTP ERROR {e.code} {e.reason}")
+              except Exception as e:
+                  out.append(f"ERROR {type(e).__name__}: {e}")
+              print(out[-1] if out[-1].startswith(("HTTP ERROR", "ERROR")) else p + " -> OK")
+          open("ims_probe.txt", "w", encoding="utf-8").write("\n".join(out))
+          PYEOF
+          python probe.py
+
+      - name: הצגת הדוח בסיכום הריצה
+        if: always()
+        run: |
+          {
+            echo '## דוח בדיקת IMS'
+            echo '```'
+            cat ims_probe.txt 2>/dev/null || echo 'לא נוצר דוח'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: שמירת הדוח להורדה
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ims_probe
+          path: ims_probe.txt
